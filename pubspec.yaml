@@ -1,0 +1,40 @@
+name: vtmap_gl
+description: A Flutter plugin for integrating Mapbox Maps inside a Flutter application on Android, iOS and web platfroms.
+version: 2.0.4
+homepage: https://github.com/tobrun/flutter-mapbox-gl
+
+dependencies:
+  flutter:
+    sdk: flutter
+  vtmap_gl_platform_interface: ^0.0.12
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  # vtmap_gl_platform_interface: 
+  #   path: ./vtmap_gl_platform_interface
+
+  #flutter_vtmap_navigation: 0.0.5
+  #flutter_mapbox_navigation : 0.0.7
+  #git:
+     # url: https://github.com/tobrun/flutter-mapbox-gl.gitzXZCXSZ
+     # path: mapbox_gl_platform_interface
+  #mapbox_gl_web: ^0.9.0
+    #git:
+     # url: https://github.com/tobrun/flutter-mapbox-gl.git
+     # path: mapbox_gl_web
+
+flutter:
+  plugin:
+    platforms:
+      android:
+        package: com.mapbox.mapboxgl
+        pluginClass: MapboxMapsPlugin
+      ios:
+        pluginClass: MapboxMapsPlugin
+     # web:
+      #  default_package: mapbox_gl_web
+
+environment:
+  sdk: '>=2.12.0 <3.0.0'
+  # Flutter versions prior to 1.10 did not support the flutter.plugin.platforms map.
+  flutter: ">=1.10.0"
