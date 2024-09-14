@@ -30,9 +30,24 @@ rootProject.allprojects {
 apply plugin: 'com.android.library'
 
 android {
+    packagingOptions {
+        pickFirst '**/armeabi-v7a/libjnigraphics.so'
+        pickFirst '**/x86/libjnigraphics.so'
+        pickFirst '**/arm64-v8a/libjnigraphics.so'
+        pickFirst '**/arm64/libjnigraphics.so'
+        pickFirst '**/x86_64/libjnigraphics.so'
+        pickFirst '**/x86/libjnigraphics.so'
+        pickFirst '**/armeabi-v7a/libmapbox-gl.so'
+        pickFirst '**/x86/libmapbox-gl.so'
+        pickFirst '**/arm64-v8a/libmapbox-gl.so'
+        pickFirst '**/x86_64/libmapbox-gl.so'
+        pickFirst '**/x86/libmapbox-gl.so'
+
+    }
     compileSdkVersion 28
 
     defaultConfig {
+
         minSdkVersion 21
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
