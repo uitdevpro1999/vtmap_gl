@@ -147,7 +147,7 @@
     },
     {
       "name": "vtmap_gl_platform_interface",
-      "rootUri": "file:///Users/accompany/.pub-cache/hosted/pub.dev/vtmap_gl_platform_interface-0.0.13",
+      "rootUri": "../../vtmap_gl_platform_interface",
       "packageUri": "lib/",
       "languageVersion": "2.12"
     },
@@ -158,7 +158,7 @@
       "languageVersion": "2.12"
     }
   ],
-  "generated": "2024-09-18T02:37:21.926175Z",
+  "generated": "2024-09-18T07:03:01.512700Z",
   "generator": "pub",
   "generatorVersion": "3.4.3",
   "flutterRoot": "file:///Users/accompany/fvm/versions/3.22.2",
