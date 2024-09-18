@@ -44,7 +44,7 @@ android {
         pickFirst '**/x86/libmapbox-gl.so'
 
     }
-    compileSdkVersion 28
+    compileSdkVersion 34
 
     defaultConfig {
 

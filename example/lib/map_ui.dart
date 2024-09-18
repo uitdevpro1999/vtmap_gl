@@ -253,10 +253,7 @@ class MapUiBodyState extends State<MapUiBody> {
       child: Text('get currently visible region'),
       onPressed: () async {
         var result = await mapController!.getVisibleRegion();
-        Scaffold.of(context).s(SnackBar(
-          content: Text(
-              "SW: ${result.southwest.toString()} NE: ${result.northeast.toString()}"),
-        ));
+
       },
     );
   }
@@ -318,8 +315,8 @@ class MapUiBodyState extends State<MapUiBody> {
         print('# features: ${features.length}');
         _clearFill();
         if (features.length == 0 && _featureQueryFilter != null) {
-          Scaffold.of(context).showSnackBar(SnackBar(
-              content: Text('QueryRenderedFeatures: No features found!')));
+          // Scaffold.of(context).showSnackBar(SnackBar(
+          //     content: Text('QueryRenderedFeatures: No features found!')));
         } else {
           _drawFill(features);
         }

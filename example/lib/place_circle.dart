@@ -120,11 +120,11 @@ class PlaceCircleBodyState extends State<PlaceCircleBody> {
 
   void _getLatLng() async {
     LatLng latLng = await controller!.getCircleLatLng(_selectedCircle!);
-    Scaffold.of(context).showSnackBar(
-      SnackBar(
-        content: Text(latLng.toString()),
-      ),
-    );
+    // Scaffold.of(context).showSnackBar(
+    //   SnackBar(
+    //     content: Text(latLng.toString()),
+    //   ),
+    // );
   }
 
   void _changeCircleStrokeOpacity() {

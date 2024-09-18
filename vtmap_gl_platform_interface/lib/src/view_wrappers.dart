@@ -57,14 +57,21 @@ class TextureAndroidViewControllerWrapper
   /// size is the view's initial size in logical pixel. size can be omitted
   /// if the concrete implementation doesn't require an initial size to create
   /// the platform view.
-  Future<void> create({ui.Size? size}) async {
+  // Future<void> create({ui.Size? size}) async {
+  //   await _controller.create();
+  //   awaitingCreation = false;
+  //   if (size != null) {
+  //     await _controller.setSize(size);
+  //   }
+  // }
+  @override
+  Future<void> create({ui.Size? size, ui.Offset? position}) async {
     await _controller.create();
-    awaitingCreation = false;
-    if (size != null) {
-      await _controller.setSize(size);
-    }
+      awaitingCreation = false;
+      if (size != null) {
+        await _controller.setSize(size);
+      }
   }
-
   /// Beginning with flutter 3, [_controller.createdCallbacks] should be called.
   ///
   /// This is for testing purposes only and is not relevant for production code.
@@ -123,6 +130,12 @@ class TextureAndroidViewControllerWrapper
     await _controller.setSize(size);
     return size;
   }
+
+
+
+  @override
+  // TODO: implement requiresViewComposition
+  bool get requiresViewComposition => false;
 }
 
 class AndroidViewWithWrappedController extends StatefulWidget {
