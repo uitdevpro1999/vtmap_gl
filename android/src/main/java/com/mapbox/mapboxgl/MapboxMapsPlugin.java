@@ -33,7 +33,7 @@ public class MapboxMapsPlugin implements FlutterPlugin, ActivityAware, Applicati
 
     // Register the view factory
     PlatformViewRegistry registry = binding.getPlatformViewRegistry();
-    registry.registerViewFactory("plugins.flutter.io/mapbox_gl", new MapboxMapFactory(state, binding.getApplicationContext()));
+    registry.registerViewFactory("plugins.flutter.io/mapbox_gl", new MapboxMapFactory(state));
   }
 
   @Override
