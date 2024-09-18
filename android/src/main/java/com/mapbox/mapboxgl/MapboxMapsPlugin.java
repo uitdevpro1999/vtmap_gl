@@ -1,8 +1,8 @@
 // Copyright 2018 The Chromium Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
-package com.mapbox.mapboxgl;
 
+package com.mapbox.mapboxgl;
 import java.util.concurrent.atomic.AtomicInteger;
 import android.app.Activity;
 import android.app.Application;
@@ -25,7 +25,9 @@ import io.flutter.plugin.common.PluginRegistry.Registrar;
  * the map. A Texture drawn using MapboxMap bitmap snapshots can then be shown instead of the
  * overlay.
  */
-public class MapboxMapsPlugin implements Application.ActivityLifecycleCallbacks {
+public class MapboxMapsPlugin implements FlutterPlugin, ActivityAware {
+
+  private static final String VIEW_TYPE = "plugins.flutter.io/mapbox_gl";
   static final int CREATED = 1;
   static final int STARTED = 2;
   static final int RESUMED = 3;
@@ -33,79 +35,195 @@ public class MapboxMapsPlugin implements Application.ActivityLifecycleCallbacks 
   static final int STOPPED = 5;
   static final int DESTROYED = 6;
   private final AtomicInteger state = new AtomicInteger(0);
-  private final int registrarActivityHashCode;
+  static FlutterAssets flutterAssets;
+  private Lifecycle lifecycle;
+
+  public MapboxMapsPlugin() {
+    // no-op
+  }
+
+  // New Plugin APIs
+
+  @Override
+  public void onAttachedToEngine(@NonNull FlutterPluginBinding binding) {
+    flutterAssets = binding.getFlutterAssets();
+
+    MethodChannel methodChannel =
+            new MethodChannel(binding.getBinaryMessenger(), "plugins.flutter.io/mapbox_gl");
+    methodChannel.setMethodCallHandler(new GlobalMethodHandler(binding));
+
+    binding
+            .getPlatformViewRegistry()
+            .registerViewFactory(
+                    "plugins.flutter.io/mapbox_gl",
+                    new MapboxMapFactory(
+                            binding.getBinaryMessenger(),
+                            new LifecycleProvider() {
+                              @Nullable
+                              @Override
+                              public Lifecycle getLifecycle() {
+                                return lifecycle;
+                              }
+                            }));
+  }
+
+  @Override
+  public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
+    // no-op
+  }
+
+  @Override
+  public void onAttachedToActivity(@NonNull ActivityPluginBinding binding) {
+    lifecycle = FlutterLifecycleAdapter.getActivityLifecycle(binding);
+  }
+
+  @Override
+  public void onDetachedFromActivityForConfigChanges() {
+    onDetachedFromActivity();
+  }
+
+  @Override
+  public void onReattachedToActivityForConfigChanges(@NonNull ActivityPluginBinding binding) {
+    onAttachedToActivity(binding);
+  }
+
+  @Override
+  public void onDetachedFromActivity() {
+    lifecycle = null;
+  }
+
+  // Old Plugin APIs
 
   public static void registerWith(Registrar registrar) {
-    if (registrar.activity() == null) {
+    final Activity activity = registrar.activity();
+    if (activity == null) {
       // When a background flutter view tries to register the plugin, the registrar has no activity.
       // We stop the registration process as this plugin is foreground only.
       return;
     }
-    final MapboxMapsPlugin plugin = new MapboxMapsPlugin(registrar);
-    registrar.activity().getApplication().registerActivityLifecycleCallbacks(plugin);
-    registrar
-            .platformViewRegistry()
-            .registerViewFactory(
-                    "plugins.flutter.io/mapbox_gl", new MapboxMapFactory(plugin.state, registrar));
+    if (activity instanceof LifecycleOwner) {
+      registrar
+              .platformViewRegistry()
+              .registerViewFactory(
+                      VIEW_TYPE,
+                      new MapboxMapFactory(
+                              registrar.messenger(),
+                              new LifecycleProvider() {
+                                @Override
+                                public Lifecycle getLifecycle() {
+                                  return ((LifecycleOwner) activity).getLifecycle();
+                                }
+                              }));
+    } else {
+      registrar
+              .platformViewRegistry()
+              .registerViewFactory(
+                      VIEW_TYPE,
+                      new MapboxMapFactory(registrar.messenger(), new ProxyLifecycleProvider(activity)));
+    }
 
     MethodChannel methodChannel =
             new MethodChannel(registrar.messenger(), "plugins.flutter.io/mapbox_gl");
     methodChannel.setMethodCallHandler(new GlobalMethodHandler(registrar));
   }
 
-  @Override
-  public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
-    if (activity.hashCode() != registrarActivityHashCode) {
-      return;
+  private static final class ProxyLifecycleProvider
+          implements Application.ActivityLifecycleCallbacks, LifecycleOwner, LifecycleProvider {
+
+    private final LifecycleRegistry lifecycle = new LifecycleRegistry(this);
+    private final int registrarActivityHashCode;
+
+    private ProxyLifecycleProvider(Activity activity) {
+      this.registrarActivityHashCode = activity.hashCode();
+      activity.getApplication().registerActivityLifecycleCallbacks(this);
     }
-    state.set(CREATED);
-  }
 
-  @Override
-  public void onActivityStarted(Activity activity) {
-    if (activity.hashCode() != registrarActivityHashCode) {
-      return;
+    @Override
+    public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+      if (activity.hashCode() != registrarActivityHashCode) {
+        return;
+      }
+      state.set(CREATED);
+      lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_CREATE);
     }
-    state.set(STARTED);
-  }
 
-  @Override
-  public void onActivityResumed(Activity activity) {
-    if (activity.hashCode() != registrarActivityHashCode) {
-      return;
+    @Override
+    public void onActivityStarted(Activity activity) {
+      if (activity.hashCode() != registrarActivityHashCode) {
+        return;
+      }
+      lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_START);
+      state.set(STARTED);
+
     }
-    state.set(RESUMED);
-  }
 
-  @Override
-  public void onActivityPaused(Activity activity) {
-    if (activity.hashCode() != registrarActivityHashCode) {
-      return;
+    @Override
+    public void onActivityResumed(Activity activity) {
+      if (activity.hashCode() != registrarActivityHashCode) {
+        return;
+      }
+      lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_RESUME);
+      state.set(RESUMED);
     }
-    state.set(PAUSED);
-  }
 
-  @Override
-  public void onActivityStopped(Activity activity) {
-    if (activity.hashCode() != registrarActivityHashCode) {
-      return;
+    @Override
+    public void onActivityPaused(Activity activity) {
+      if (activity.hashCode() != registrarActivityHashCode) {
+        return;
+      }
+      lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE);
+      state.set(PAUSED);
     }
-    state.set(STOPPED);
-  }
 
-  @Override
-  public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
-  }
-
-  @Override
-  public void onActivityDestroyed(Activity activity) {
-    if (activity.hashCode() != registrarActivityHashCode) {
-      return;
+    @Override
+    public void onActivityStopped(Activity activity) {
+      if (activity.hashCode() != registrarActivityHashCode) {
+        return;
+      }
+      lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_STOP);
+      state.set(STOPPED);
     }
-    state.set(DESTROYED);
+
+    @Override
+    public void onActivitySaveInstanceState(Activity activity, Bundle outState) {}
+
+    @Override
+    public void onActivityDestroyed(Activity activity) {
+      if (activity.hashCode() != registrarActivityHashCode) {
+        return;
+      }
+      activity.getApplication().unregisterActivityLifecycleCallbacks(this);
+      lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY);
+      state.set(DESTROYED);
+    }
+
+    @NonNull
+    @Override
+    public Lifecycle getLifecycle() {
+      return lifecycle;
+    }
   }
 
-  private MapboxMapsPlugin(Registrar registrar) {
-    this.registrarActivityHashCode = registrar.activity().hashCode();
+  interface LifecycleProvider {
+    @Nullable
+    Lifecycle getLifecycle();
+  }
+
+  /** Provides a static method for extracting lifecycle objects from Flutter plugin bindings. */
+  public static class FlutterLifecycleAdapter {
+
+    /**
+     * Returns the lifecycle object for the activity a plugin is bound to.
+     *
+     * <p>Returns null if the Flutter engine version does not include the lifecycle extraction code.
+     * (this probably means the Flutter engine version is too old).
+     */
+    @NonNull
+    public static Lifecycle getActivityLifecycle(
+            @NonNull ActivityPluginBinding activityPluginBinding) {
+      HiddenLifecycleReference reference =
+              (HiddenLifecycleReference) activityPluginBinding.getLifecycle();
+      return reference.getLifecycle();
+    }
   }
 }
