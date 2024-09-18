@@ -13,7 +13,7 @@ import io.flutter.embedding.engine.plugins.activity.ActivityAware;
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.PluginRegistry;
-import io.flutter.plugin.activity.ActivityResultListener; // Import này cần thiết
+import io.flutter.embedding.engine.plugins.activity.ActivityResultListener;
 import io.flutter.plugin.platform.PlatformViewRegistry;
 
 public class MapboxMapsPlugin implements FlutterPlugin, ActivityAware, Application.ActivityLifecycleCallbacks, ActivityResultListener {
@@ -27,11 +27,10 @@ public class MapboxMapsPlugin implements FlutterPlugin, ActivityAware, Applicati
   private final AtomicInteger state = new AtomicInteger(0);
   private MethodChannel methodChannel;
   private Activity activity;
-  private final int registrarActivityHashCode;
 
   // Constructor for the old API
   private MapboxMapsPlugin(PluginRegistry.Registrar registrar) {
-    this.registrarActivityHashCode = registrar.activity().hashCode();
+    // Initialization if needed
   }
 
   // New API onAttachedToEngine
@@ -90,41 +89,26 @@ public class MapboxMapsPlugin implements FlutterPlugin, ActivityAware, Applicati
   // Activity Lifecycle Callbacks
   @Override
   public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
-    if (activity.hashCode() != registrarActivityHashCode) {
-      return;
-    }
     state.set(CREATED);
   }
 
   @Override
   public void onActivityStarted(Activity activity) {
-    if (activity.hashCode() != registrarActivityHashCode) {
-      return;
-    }
     state.set(STARTED);
   }
 
   @Override
   public void onActivityResumed(Activity activity) {
-    if (activity.hashCode() != registrarActivityHashCode) {
-      return;
-    }
     state.set(RESUMED);
   }
 
   @Override
   public void onActivityPaused(Activity activity) {
-    if (activity.hashCode() != registrarActivityHashCode) {
-      return;
-    }
     state.set(PAUSED);
   }
 
   @Override
   public void onActivityStopped(Activity activity) {
-    if (activity.hashCode() != registrarActivityHashCode) {
-      return;
-    }
     state.set(STOPPED);
   }
 
@@ -134,9 +118,6 @@ public class MapboxMapsPlugin implements FlutterPlugin, ActivityAware, Applicati
 
   @Override
   public void onActivityDestroyed(Activity activity) {
-    if (activity.hashCode() != registrarActivityHashCode) {
-      return;
-    }
     state.set(DESTROYED);
   }
 
