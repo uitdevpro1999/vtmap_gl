@@ -12,11 +12,9 @@ import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
 import io.flutter.plugin.common.MethodChannel;
-import io.flutter.plugin.common.PluginRegistry;
-import io.flutter.embedding.engine.plugins.activity.ActivityResultListener;
 import io.flutter.plugin.platform.PlatformViewRegistry;
 
-public class MapboxMapsPlugin implements FlutterPlugin, ActivityAware, Application.ActivityLifecycleCallbacks, ActivityResultListener {
+public class MapboxMapsPlugin implements FlutterPlugin, ActivityAware, Application.ActivityLifecycleCallbacks {
   static final int CREATED = 1;
   static final int STARTED = 2;
   static final int RESUMED = 3;
@@ -28,12 +26,6 @@ public class MapboxMapsPlugin implements FlutterPlugin, ActivityAware, Applicati
   private MethodChannel methodChannel;
   private Activity activity;
 
-  // Constructor for the old API
-  private MapboxMapsPlugin(PluginRegistry.Registrar registrar) {
-    // Initialization if needed
-  }
-
-  // New API onAttachedToEngine
   @Override
   public void onAttachedToEngine(@NonNull FlutterPluginBinding binding) {
     methodChannel = new MethodChannel(binding.getBinaryMessenger(), "plugins.flutter.io/mapbox_gl");
@@ -52,7 +44,6 @@ public class MapboxMapsPlugin implements FlutterPlugin, ActivityAware, Applicati
   @Override
   public void onAttachedToActivity(@NonNull ActivityPluginBinding binding) {
     this.activity = binding.getActivity();
-    binding.addActivityResultListener(this);
     activity.getApplication().registerActivityLifecycleCallbacks(this);
   }
 
@@ -69,21 +60,6 @@ public class MapboxMapsPlugin implements FlutterPlugin, ActivityAware, Applicati
   @Override
   public void onDetachedFromActivity() {
     activity = null;
-  }
-
-  // Old API registerWith method
-  public static void registerWith(PluginRegistry.Registrar registrar) {
-    if (registrar.activity() == null) {
-      return; // Plugin is foreground only
-    }
-    final MapboxMapsPlugin plugin = new MapboxMapsPlugin(registrar);
-    registrar.activity().getApplication().registerActivityLifecycleCallbacks(plugin);
-    registrar
-            .platformViewRegistry()
-            .registerViewFactory("plugins.flutter.io/mapbox_gl", new MapboxMapFactory(plugin.state, registrar));
-
-    MethodChannel methodChannel = new MethodChannel(registrar.messenger(), "plugins.flutter.io/mapbox_gl");
-    methodChannel.setMethodCallHandler(new GlobalMethodHandler(registrar));
   }
 
   // Activity Lifecycle Callbacks
@@ -119,11 +95,5 @@ public class MapboxMapsPlugin implements FlutterPlugin, ActivityAware, Applicati
   @Override
   public void onActivityDestroyed(Activity activity) {
     state.set(DESTROYED);
-  }
-
-  @Override
-  public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
-    // Xử lý kết quả ở đây nếu cần
-    return false; // Trả về true nếu bạn đã xử lý kết quả
   }
 }
