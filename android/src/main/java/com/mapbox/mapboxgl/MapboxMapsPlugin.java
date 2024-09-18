@@ -2,6 +2,7 @@ package com.mapbox.mapboxgl;
 
 import android.app.Activity;
 import android.app.Application;
+import android.content.Intent;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 
@@ -12,7 +13,7 @@ import io.flutter.embedding.engine.plugins.activity.ActivityAware;
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.PluginRegistry;
-import io.flutter.plugin.activity.ActivityResultListener;
+import io.flutter.plugin.activity.ActivityResultListener; // Import này cần thiết
 import io.flutter.plugin.platform.PlatformViewRegistry;
 
 public class MapboxMapsPlugin implements FlutterPlugin, ActivityAware, Application.ActivityLifecycleCallbacks, ActivityResultListener {
