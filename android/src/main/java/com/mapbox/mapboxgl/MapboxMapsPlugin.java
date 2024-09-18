@@ -12,25 +12,25 @@ import io.flutter.embedding.engine.plugins.activity.ActivityAware;
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.PluginRegistry;
+import io.flutter.plugin.activity.ActivityResultListener;
 import io.flutter.plugin.platform.PlatformViewRegistry;
 
-public class MapboxMapsPlugin implements FlutterPlugin, ActivityAware, Application.ActivityLifecycleCallbacks {
-  private MethodChannel methodChannel;
-  private Activity activity;
+public class MapboxMapsPlugin implements FlutterPlugin, ActivityAware, Application.ActivityLifecycleCallbacks, ActivityResultListener {
   static final int CREATED = 1;
   static final int STARTED = 2;
   static final int RESUMED = 3;
   static final int PAUSED = 4;
   static final int STOPPED = 5;
   static final int DESTROYED = 6;
+
   private final AtomicInteger state = new AtomicInteger(0);
+  private MethodChannel methodChannel;
+  private Activity activity;
   private final int registrarActivityHashCode;
 
   // Constructor for the old API
-  public MapboxMapsPlugin(PluginRegistry.Registrar registrar) {
+  private MapboxMapsPlugin(PluginRegistry.Registrar registrar) {
     this.registrarActivityHashCode = registrar.activity().hashCode();
-    this.activity = registrar.activity();
-    registerWith(registrar);
   }
 
   // New API onAttachedToEngine
@@ -51,8 +51,9 @@ public class MapboxMapsPlugin implements FlutterPlugin, ActivityAware, Applicati
 
   @Override
   public void onAttachedToActivity(@NonNull ActivityPluginBinding binding) {
-    activity = binding.getActivity();
+    this.activity = binding.getActivity();
     binding.addActivityResultListener(this);
+    activity.getApplication().registerActivityLifecycleCallbacks(this);
   }
 
   @Override
@@ -91,7 +92,7 @@ public class MapboxMapsPlugin implements FlutterPlugin, ActivityAware, Applicati
     if (activity.hashCode() != registrarActivityHashCode) {
       return;
     }
-    state.set(CREATED); // CREATED
+    state.set(CREATED);
   }
 
   @Override
@@ -99,7 +100,7 @@ public class MapboxMapsPlugin implements FlutterPlugin, ActivityAware, Applicati
     if (activity.hashCode() != registrarActivityHashCode) {
       return;
     }
-    state.set(STARTED); // STARTED
+    state.set(STARTED);
   }
 
   @Override
@@ -107,7 +108,7 @@ public class MapboxMapsPlugin implements FlutterPlugin, ActivityAware, Applicati
     if (activity.hashCode() != registrarActivityHashCode) {
       return;
     }
-    state.set(RESUMED); // RESUMED
+    state.set(RESUMED);
   }
 
   @Override
@@ -115,7 +116,7 @@ public class MapboxMapsPlugin implements FlutterPlugin, ActivityAware, Applicati
     if (activity.hashCode() != registrarActivityHashCode) {
       return;
     }
-    state.set(PAUSED); // PAUSED
+    state.set(PAUSED);
   }
 
   @Override
@@ -123,7 +124,7 @@ public class MapboxMapsPlugin implements FlutterPlugin, ActivityAware, Applicati
     if (activity.hashCode() != registrarActivityHashCode) {
       return;
     }
-    state.set(STOPPED); // STOPPED
+    state.set(STOPPED);
   }
 
   @Override
@@ -135,6 +136,12 @@ public class MapboxMapsPlugin implements FlutterPlugin, ActivityAware, Applicati
     if (activity.hashCode() != registrarActivityHashCode) {
       return;
     }
-    state.set(DESTROYED); // DESTROYED
+    state.set(DESTROYED);
+  }
+
+  @Override
+  public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
+    // Xử lý kết quả ở đây nếu cần
+    return false; // Trả về true nếu bạn đã xử lý kết quả
   }
 }
