@@ -17,6 +17,12 @@ import io.flutter.plugin.platform.PlatformViewRegistry;
 public class MapboxMapsPlugin implements FlutterPlugin, ActivityAware, Application.ActivityLifecycleCallbacks {
   private MethodChannel methodChannel;
   private Activity activity;
+  static final int CREATED = 1;
+  static final int STARTED = 2;
+  static final int RESUMED = 3;
+  static final int PAUSED = 4;
+  static final int STOPPED = 5;
+  static final int DESTROYED = 6;
   private final AtomicInteger state = new AtomicInteger(0);
   private final int registrarActivityHashCode;
 
@@ -85,7 +91,7 @@ public class MapboxMapsPlugin implements FlutterPlugin, ActivityAware, Applicati
     if (activity.hashCode() != registrarActivityHashCode) {
       return;
     }
-    state.set(1); // CREATED
+    state.set(CREATED); // CREATED
   }
 
   @Override
@@ -93,7 +99,7 @@ public class MapboxMapsPlugin implements FlutterPlugin, ActivityAware, Applicati
     if (activity.hashCode() != registrarActivityHashCode) {
       return;
     }
-    state.set(2); // STARTED
+    state.set(STARTED); // STARTED
   }
 
   @Override
@@ -101,7 +107,7 @@ public class MapboxMapsPlugin implements FlutterPlugin, ActivityAware, Applicati
     if (activity.hashCode() != registrarActivityHashCode) {
       return;
     }
-    state.set(3); // RESUMED
+    state.set(RESUMED); // RESUMED
   }
 
   @Override
@@ -109,7 +115,7 @@ public class MapboxMapsPlugin implements FlutterPlugin, ActivityAware, Applicati
     if (activity.hashCode() != registrarActivityHashCode) {
       return;
     }
-    state.set(4); // PAUSED
+    state.set(PAUSED); // PAUSED
   }
 
   @Override
@@ -117,7 +123,7 @@ public class MapboxMapsPlugin implements FlutterPlugin, ActivityAware, Applicati
     if (activity.hashCode() != registrarActivityHashCode) {
       return;
     }
-    state.set(5); // STOPPED
+    state.set(STOPPED); // STOPPED
   }
 
   @Override
@@ -129,6 +135,6 @@ public class MapboxMapsPlugin implements FlutterPlugin, ActivityAware, Applicati
     if (activity.hashCode() != registrarActivityHashCode) {
       return;
     }
-    state.set(6); // DESTROYED
+    state.set(DESTROYED); // DESTROYED
   }
 }
