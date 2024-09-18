@@ -16,7 +16,8 @@ dependencies:
   location: ^4.4.0
   http: ^0.13.5
   fluttertoast: ^8.0.9
-  vtmap_gl_platform_interface: ^0.0.12
+  vtmap_gl_platform_interface:
+    path: ../vtmap_gl_platform_interface
   # vtmap_gl: ^2.0.2
 # dependency_overrides:
   # vtmap_gl_platform_interface:

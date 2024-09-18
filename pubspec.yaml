@@ -6,7 +6,8 @@ homepage: https://github.com/tobrun/flutter-mapbox-gl
 dependencies:
   flutter:
     sdk: flutter
-  vtmap_gl_platform_interface: ^0.0.12
+  vtmap_gl_platform_interface:
+    path: ./vtmap_gl_platform_interface
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -35,6 +36,6 @@ flutter:
       #  default_package: mapbox_gl_web
 
 environment:
-  sdk: '>=2.12.0 <3.0.0'
+  sdk: '>=2.12.0 <4.0.0'
   # Flutter versions prior to 1.10 did not support the flutter.plugin.platforms map.
   flutter: ">=1.10.0"
