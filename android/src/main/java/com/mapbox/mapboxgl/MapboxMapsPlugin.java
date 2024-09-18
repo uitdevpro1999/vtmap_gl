@@ -25,7 +25,7 @@ import io.flutter.plugin.common.PluginRegistry.Registrar;
  * the map. A Texture drawn using MapboxMap bitmap snapshots can then be shown instead of the
  * overlay.
  */
-public class MapboxMapsPlugin implements FlutterPlugin, ActivityAware {
+public class MapboxMapsPlugin implements FlutterPlugin, ActivityAware, Application.ActivityLifecycleCallbacks {
 
   private static final String VIEW_TYPE = "plugins.flutter.io/mapbox_gl";
   static final int CREATED = 1;
