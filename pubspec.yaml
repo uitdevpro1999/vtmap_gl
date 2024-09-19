@@ -7,7 +7,6 @@ dependencies:
   flutter:
     sdk: flutter
   vtmap_gl_platform_interface:
-    path: ./vtmap_gl_platform_interface
 dev_dependencies:
   flutter_test:
     sdk: flutter
